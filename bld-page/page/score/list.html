@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../lib/layui/css/layui.css">
+</head>
+<body>
+<br/>
+<div class="layui-form-item">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <form id="searchForm">
+                <div class="layui-inline">
+                    <label class="layui-form-label">姓名/手机号</label>
+                    <div class="layui-input-inline">
+                        <input type="tel" name="keyWord" autocomplete="off" class="layui-input" placeholder="姓名/手机号">
+                    </div>
+                </div>
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-radius" onclick="search()">查询</button>
+
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-radius" onclick="addUser()">添加</button>
+
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">总分</label>
+                    <div class="layui-input-inline">
+                        <input type="tel" id="totalScore" readonly="readonly" name="totalScore" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<table class="layui-table" id="scoreTable" lay-filter="test">
+
+</table>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+
+<script src="../../lib/jquery/1.9.1/jquery.js"></script>
+<script src="../../js/action.js"></script>
+<script src="../../lib/layui/layui.js"></script>
+<!--<include src="../common/footer_js.html"></include>-->
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script type="text/javascript">
+    //console.info(JSON.stringify($("#searchForm").serializeJSON()));
+    var option;
+    var tableIns;
+    var listUr="http://120.27.245.71:8070/taiqiu/score/list";
+    $(function() {
+
+        $.fn.serializeObject = function () {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+
+        option={
+            elem: '#scoreTable'
+            ,url: listUr //数据接口
+            ,where: $('#searchForm').serializeObject() //如果无需传递额外参数，可不加该参数
+            ,method: 'post' //如果无需自定义HTTP类型，可不加该参数
+            ,contentType: 'application/json'
+            ,page: true //开启分页
+            ,loading:true
+            ,cols: [[ //表头
+                {field: 'id', title: 'ID', width:80, sort: true, fixed: 'true'}
+                ,{field: 'name', title: '姓名', width:150}
+                ,{field: 'mobilePhone', title: '手机号', width:150}
+                ,{field: 'standNumber', title: '站数', width: 150, sort: true}
+                ,{field: 'rank', title: '名次', width: 150, sort: true}
+                ,{field: 'score', title: '分数', width: 150, sort: true}
+                ,{field: 'createTime', title: '创建时间',  sort: true,templet:function (d) {
+                    return typeSize(d,'createTime');
+                }
+                }
+                ,{fixed: 'right',title: '操作', width:178, align:'center', toolbar: '#barDemo'}
+            ]]
+            ,request: {
+                pageName: 'pageNum' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            ,response: {
+                statusName: 'code' //规定数据状态的字段名称，默认：code
+                ,statusCode: 200 //规定成功的状态码，默认：0
+                ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                ,countName: 'totalCount' //规定数据总数的字段名称，默认：count
+                // ,dataName: 'rows' //规定数据列表的字段名称，默认：data
+            }
+        };
+        layui.use('table', function(){
+            var table = layui.table;
+            //第一个实例
+            tableIns=table.render(option);
+
+            //监听工具条
+            table.on('tool(test)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'edit'){
+                    layer.open({
+                        id: 'add-form',
+                        type: 2,
+                        area: ['500px', '500px'],
+                        end:function(){
+                            search();
+                        },
+                        success:function(layero, index){
+                            console.log(layero, index);
+                            var frameId=document.getElementById('add-form').getElementsByTagName("iframe")[0].id;
+                            $('#'+frameId)[0].contentWindow.setInitValue(data);
+
+                        },
+                        content: "score-edit.html" //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                    });
+                }
+            });
+        });
+
+        totalScore();
+    });
+
+
+    function search(){
+        //上述方法等价于
+        tableIns.reload({
+            elem: '#scoreTable'
+            ,url: listUr //数据接口
+            ,where: $('#searchForm').serializeObject() //如果无需传递额外参数，可不加该参数
+            ,method: 'post' //如果无需自定义HTTP类型，可不加该参数
+            ,contentType: 'application/json'
+            ,page: true //开启分页
+            ,loading:true
+            ,cols: [[ //表头
+                {field: 'id', title: 'ID', width:80, sort: true, fixed: 'true'}
+                ,{field: 'name', title: '姓名', width:150}
+                ,{field: 'mobilePhone', title: '手机号', width:150}
+                ,{field: 'standNumber', title: '站数', width: 150, sort: true}
+                ,{field: 'rank', title: '名次', width: 150, sort: true}
+                ,{field: 'score', title: '分数', width: 150, sort: true}
+                ,{field: 'createTime', title: '创建时间',  sort: true,templet:function (d) {
+                    return typeSize(d,'createTime');
+                }
+                }
+                ,{fixed: 'right',title: '操作', width:178, align:'center', toolbar: '#barDemo'}
+            ]]
+            ,request: {
+                pageName: 'pageNum' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            ,response: {
+                statusName: 'code' //规定数据状态的字段名称，默认：code
+                ,statusCode: 200 //规定成功的状态码，默认：0
+                ,msgName: 'msg' //规定状态信息的字段名称，默认：msg
+                ,countName: 'totalCount' //规定数据总数的字段名称，默认：count
+                // ,dataName: 'rows' //规定数据列表的字段名称，默认：data
+            }
+            /*,done: function(res, curr, count){
+
+                $("[data-field = 'status']").children().each(function(){
+                    if($(this).text() == '1'){
+                        $(this).text("发布");
+
+                    }else if($(this).text() == '1'){
+                        $(this).text("禁用");
+
+                    }
+
+                })
+
+            }*/
+
+        });
+
+        totalScore();
+    }
+
+
+    function typeSize(obj,td){
+        if(td=='createTime'){
+            return Action.formatDate(obj.createTime)
+        }
+    }
+
+
+    function addUser(){
+        layer.open({
+            type: 2,
+            area: ['500px', '500px'],
+            end:function(){
+                search();
+            },
+            content: "score-add.html" //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+        });
+    }
+
+    function totalScore(){
+        var url="/score/total";
+        Action.callPostService(url,JSON.stringify($('#searchForm').serializeObject()),function (obj){
+
+            $("#totalScore").val(obj.data)
+
+        },1);
+    }
+</script>
+</body>
+</html>

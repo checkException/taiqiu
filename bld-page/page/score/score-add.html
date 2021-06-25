@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户添加</title>
+    <link rel="stylesheet" href="../../lib/layui/css/layui.css">
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="title" autocomplete="off" placeholder="请输入姓名" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入手机号</label>
+        <div class="layui-input-block">
+            <input type="text" name="mobilePhone" lay-verify="required" lay-reqtext="手机号是必填项，岂能为空？" placeholder="请输入您的手机号" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入站次</label>
+        <div class="layui-input-block">
+            <input type="text" name="standNumber" placeholder="请输入站次" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入名次</label>
+        <div class="layui-input-block">
+            <input type="text" name="rank"  placeholder="请输入站次" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入分数</label>
+        <div class="layui-input-block">
+            <input type="text" name="score"  placeholder="请输入您的请输入分数昵称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="userInfoSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="../../lib/jquery/1.9.1/jquery.js"></script>
+<script src="../../lib/layui/layui.js"></script>
+<script src="../../js/action.js"></script>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer,
+            layedit = layui.layedit
+            ,laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 2){
+                    return '标题至少得2个字符啊';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(userInfoSubmit)', function(data){
+            var url="/score/add";
+            Action.callPostService(url,JSON.stringify(data.field),function (obj){
+                layer.alert(obj.data, {
+                    title: '提示语'
+                });
+
+                parent.layer.closeAll();
+            },1);
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>

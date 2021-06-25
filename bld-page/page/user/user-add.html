@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户添加</title>
+    <link rel="stylesheet" href="../../lib/layui/css/layui.css">
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="userName" lay-verify="title" autocomplete="off" placeholder="请输入用户名" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">请输入昵称</label>
+        <div class="layui-input-block">
+            <input type="text" name="nickName" lay-verify="required" lay-reqtext="昵称是必填项，岂能为空？" placeholder="请输入您的昵称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">验证手机</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="mobilePhone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="userInfoSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="../../lib/jquery/1.9.1/jquery.js"></script>
+<script src="../../lib/layui/layui.js"></script>
+<script src="../../js/action.js"></script>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer,
+            layedit = layui.layedit
+            ,laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 2){
+                    return '标题至少得2个字符啊';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(userInfoSubmit)', function(data){
+            var url="user/add";
+            Action.callPostService(url,JSON.stringify(data.field),function (obj){
+                layer.alert(obj.data, {
+                    title: '提示语'
+                });
+
+                parent.layer.closeAll();
+            },1);
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>

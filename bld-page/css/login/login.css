@@ -1,0 +1,46 @@
+.loginWraper {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    background: #3283AC url(../../image/login/admin-login-bg.jpg) no-repeat center;
+}
+
+.loginBox {
+    position: absolute;
+    width: 617px;
+    height: 330px;
+    background: url(../../image/login/admin-loginform-bg.png) no-repeat;
+    left: 50%;
+    top: 50%;
+    margin-left: -309px;
+    margin-top: -184px;
+    padding-top: 38px;
+}
+
+.loginBox div {
+    box-sizing: border-box;
+    margin-left: 25px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.loginBox div .input_text{
+    font-size: 16px;
+    height: 20px;
+    width: 70%;
+    padding: 8px;
+    margin-left: 13%;
+    border: solid 1px #ddd;
+}
+
+.loginBox div input[type="button"]{
+    height: 40px;
+    width: 20%;
+    margin-left: 40%;
+    font-size: 14px;
+    color:#2D93CA ;
+}
